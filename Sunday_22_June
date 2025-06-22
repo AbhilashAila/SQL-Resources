@@ -1,0 +1,94 @@
+--CREATE TABLE Orders (
+--    OrderID INT,
+--    CustomerID INT,
+--    OrderDate DATE
+--);
+--INSERT INTO Orders (OrderID, CustomerID, OrderDate) VALUES
+--(1, 101, '2020-01-15'),
+--(2, 101, '2020-05-20'),
+--(3, 101, '2020-11-30'),
+--(4, 101, '2021-02-10'),
+--(5, 101, '2021-04-18'),
+--(6, 101, '2021-07-25'),
+
+--(7, 102, '2020-03-10'),
+--(8, 102, '2020-07-11'),
+--(9, 102, '2021-01-05'),
+--(10, 102, '2021-03-14'),
+
+--(11, 103, '2020-06-01'),
+--(12, 103, '2021-08-21'),
+--(13, 103, '2021-09-11'),
+--(14, 103, '2021-10-01'),
+
+--(15, 104, '2020-02-02'),
+--(16, 104, '2020-03-03'),
+--(17, 104, '2020-04-04'),
+--(18, 104, '2021-01-01'),
+--(19, 104, '2021-02-02'),
+--(20, 104, '2021-03-03');
+
+
+--1. list the ids of customer who made atleast 3 orders in 2020 and 2021 with table schema and records
+
+--select 
+--CustomerID
+--from orders
+--where DATEPART(year,orderdate) = 2020
+--group by CustomerID
+--having COUNT(*)>=3
+--intersect
+--select 
+--CustomerID
+--from orders
+--where DATEPART(year,orderdate) = 2021
+--group by CustomerID
+--having COUNT(*)>=3
+
+
+--CREATE TABLE UserPoints (
+--    UserID INT,
+--    PointDate DATE,
+--    Points INT
+--);
+--INSERT INTO UserPoints (UserID, PointDate, Points) VALUES
+--(1, '2024-01-01', 20),
+--(1, '2024-01-05', 30),
+--(1, '2024-01-10', 40),
+--(1, '2024-01-15', 15),
+--(2, '2024-01-02', 50),
+--(2, '2024-01-06', 30),
+--(2, '2024-01-09', 25),
+--(3, '2024-01-03', 60),
+--(3, '2024-01-08', 30),
+--(4, '2024-01-01', 40),
+--(4, '2024-01-03', 20),
+--(4, '2024-01-05', 25),
+--(4, '2024-01-07', 15),
+--(5, '2024-01-01', 10),
+--(5, '2024-01-02', 15),
+--(5, '2024-01-03', 10),
+--(5, '2024-01-04', 20),
+--(5, '2024-01-05', 15),
+--(5, '2024-01-06', 25),
+--(5, '2024-01-07', 25),
+--(6, '2024-01-01', 25),
+--(6, '2024-01-03', 30),
+--(6, '2024-01-05', 20);
+
+--2. identify user when reaching 100 points userid ,date points as columns create table schema
+
+--with cte as
+--(
+--select 
+--UserID,
+--PointDate,
+--SUM(Points) over(partition by userid order by pointdate) as runningusm
+--from UserPoints
+--)
+--select 
+--USERID,
+--MIN(PointDate) as date
+--from cte
+--where runningusm>=100
+--group by USERID
