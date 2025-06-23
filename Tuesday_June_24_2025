@@ -1,0 +1,208 @@
+--create database June_24_2025
+
+--use June_24_2025
+
+--CREATE TABLE survey_responses (
+--    respondent_id INT,
+--    question_id INT,
+--    question_text NVARCHAR(100),
+--    response_value NVARCHAR(50)
+--);
+
+--INSERT INTO survey_responses (respondent_id, question_id, question_text, response_value)
+--VALUES
+--    (1, 101, 'Satisfaction Level', '4'),
+--    (1, 102, 'Recommend to Friend', 'Yes'),
+--    (1, 103, 'Favorite Feature', 'Speed'),
+--    (2, 101, 'Satisfaction Level', '2'),
+--    (2, 102, 'Recommend to Friend', 'No'),
+--    (2, 103, 'Favorite Feature', 'UI'),
+--    (3, 101, 'Satisfaction Level', '5'),
+--    (3, 102, 'Recommend to Friend', 'Yes'),
+--    (3, 103, 'Favorite Feature', 'Support');
+
+--1. The output should look like for each respondent_id , we should have columns like satisfaction level,recommend to friend favorite feature.
+
+--select 
+--respondent_id,
+--max(case when question_text = 'Satisfaction level' then response_value end) as Satisfaction_level,
+--max(case when question_text = 'Recommend to Friend' then response_value end) as Recommend_to_Friend,
+--max(case when question_text = 'Favorite Feature' then response_value end) as Favorite_Feature
+--from survey_responses
+--group by respondent_id
+
+
+--CREATE TABLE sales_data (
+--    brand VARCHAR(50),
+--    year INT,
+--    amount DECIMAL(10, 2)
+--);
+
+--INSERT INTO sales_data (brand, year, amount) VALUES
+--('BrandA', 2021, 1000.00),
+--('BrandA', 2022, 1200.00),
+--('BrandA', 2023, 1400.00),
+--('BrandA', 2024, 1600.00),
+--('BrandB', 2021, 2000.00),
+--('BrandB', 2022, 1900.00),
+--('BrandB', 2023, 2100.00),
+--('BrandC', 2021, 1500.00),
+--('BrandC', 2022, 1700.00),
+--('BrandC', 2023, 1700.00),
+--('BrandD', 2020, 800.00),
+--('BrandD', 2021, 1000.00),
+--('BrandD', 2022, 1300.00),
+--('BrandD', 2023, 1500.00),
+--('BrandD', 2024, 1800.00),
+--('BrandE', 2020, 500.00),
+--('BrandE', 2022, 800.00),
+--('BrandE', 2023, 900.00),
+--('BrandF', 2021, 3000.00),
+--('BrandF', 2022, 2500.00),
+--('BrandF', 2023, 2400.00),
+--('BrandG', 2022, 1000.00),
+--('BrandG', 2023, 1200.00),
+--('BrandG', 2024, 1400.00);
+
+--2. write a sql query to fetch the records of brand whose amount is increasing every year   
+
+--with cte as 
+--(
+--select * ,
+--LAG(amount,1,amount-1) over(partition by brand order by year) as prev_amt,
+--case when amount >LAG(amount,1,amount-1) over(partition by brand order by year) then 1 else 0 end as flg
+--from sales_data
+--)
+--select * from sales_data
+--where brand not in (select brand from cte where flg = 0)
+
+
+---- Create Students table
+--CREATE TABLE Students (
+--    student_id INT PRIMARY KEY,
+--    student_name VARCHAR(50)
+--);
+
+---- Insert data into Students
+--INSERT INTO Students (student_id, student_name) VALUES
+--(1, 'Alice'),
+--(2, 'Bob'),
+--(3, 'John'),
+--(4, 'Alex');
+
+
+---- Create Examinations table
+--CREATE TABLE Examinations (
+--    student_id INT,
+--    subject_name VARCHAR(50)
+--);
+
+---- Insert data into Examinations
+--INSERT INTO Examinations (student_id, subject_name) VALUES
+--(1, 'Math'),
+--(1, 'Physics'),
+--(1, 'Programming'),
+--(2, 'Programming'),
+--(1, 'Physics'),
+--(1, 'Math'),
+--(3, 'Math'),
+--(3, 'Programming'),
+--(3, 'Physics'),
+--(2, 'Math'),
+--(1, 'Math'),
+--(4, 'Math');
+
+--3. Write a sql query to find no of times each student attended each exam
+
+--select 
+--s.student_id,
+--s.student_name,
+--e.subject_name,
+--COUNT(subject_name) as sub_cnt
+--from Students s
+--join Examinations e
+--on s.student_id =e.student_id
+--group by s.student_id,
+--s.student_name,
+--e.subject_name
+--order by student_id
+
+
+--create table bus(
+--personId int, 
+--personName varchar(100),
+--personWeight int,
+--turn int);
+
+--insert into bus values(5,'john',120,2)
+--insert into bus values(4,'tom',100,1)
+--insert into bus values(3,'rahul',95,4)
+--insert into bus values(6,'bhavna',100,5)
+--insert into bus values(1,'ankita',79,6)
+--insert into bus values(2,'Alex',80,3)
+
+--4. Write a sql query to find the person name of the last person that can fit on the bus without exceeding the weight limit . limit 400
+
+--with cte as
+--(
+--select *,
+--SUM(personWeight) over(order by turn) as running_wt
+--from bus
+--),
+--cte2 as
+--(
+--select *,
+--ROW_NUMBER() over(order by turn desc) as rn
+--from cte
+--where running_wt<=400
+--)
+--select * from cte2
+--where rn = 1
+
+--CREATE TABLE sale_data (
+--    salespersonname VARCHAR(50),
+--    saledate DATE,
+--    amount DECIMAL(10,2)
+--);
+
+--INSERT INTO sale_data (salespersonname, saledate, amount) VALUES
+--('Alice', '2024-01-01', 10000),
+--('Alice', '2024-01-10', 15000),
+--('Alice', '2024-01-20', 25000),
+--('Alice', '2024-01-25', 20000),
+--('Alice', '2024-02-01', 30000),
+--('Bob', '2024-01-02', 15000),
+--('Bob', '2024-01-12', 18000),
+--('Bob', '2024-01-22', 20000),
+--('Bob', '2024-01-29', 25000),
+--('Bob', '2024-02-03', 22000),
+--('Charlie', '2024-01-05', 5000),
+--('Charlie', '2024-01-15', 8000),
+--('Charlie', '2024-01-20', 7000),
+--('Charlie', '2024-01-25', 10000),
+--('Charlie', '2024-02-01', 12000),
+--('Charlie', '2024-02-05', 15000),
+--('Charlie', '2024-02-10', 18000),
+--('Charlie', '2024-02-20', 20000), 
+--('Charlie', '2024-02-25', 8000),
+--('Dave', '2024-01-03', 20000),
+--('Dave', '2024-01-13', 30000),
+--('Dave', '2024-01-23', 30000),
+--('Dave', '2024-02-01', 10000),
+--('Dave', '2024-02-10', 5000),
+--('Dave', '2024-02-15', 8000);  
+
+
+--5. Find Running Total of a person who reached 100k first
+
+--with cte as
+--(
+--select *,
+--SUM(amount) over(partition by salespersonname order by saledate) as runningsum
+--from sale_data
+--)
+--select salespersonname,
+--MIN(saledate) as target_reached
+--from cte
+--where runningsum >=100000
+--group by salespersonname
