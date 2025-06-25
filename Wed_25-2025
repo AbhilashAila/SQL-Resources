@@ -1,0 +1,235 @@
+--create database Wed_25_2025
+
+--use Wed_25_2025
+
+--CREATE TABLE purchases (
+--    id INT PRIMARY KEY,
+--    createdon DATE,
+--    value DECIMAL(10, 2),
+--    purchaseid INT
+--);
+
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (1, '2023-01-12', 512.45, 1);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (2, '2023-01-25', 678.90, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (3, '2023-02-05', 890.32, 3);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (4, '2023-02-18', 412.78, 1);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (5, '2023-03-01', 722.60, 4);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (6, '2023-03-16', 334.90, 5);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (7, '2023-03-27', 920.00, 6);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (8, '2023-04-02', 788.44, 3);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (9, '2023-04-15', 645.22, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (10, '2023-05-01', 701.90, 1);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (11, '2023-05-13', 555.67, 4);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (12, '2023-05-27', 435.11, 5);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (13, '2023-06-05', 632.78, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (14, '2023-06-20', 799.00, 6);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (15, '2023-07-03', 884.65, 3);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (16, '2023-07-19', 703.21, 4);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (17, '2023-08-01', 462.00, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (18, '2023-08-15', 899.10, 1);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (19, '2023-08-27', 510.50, 5);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (20, '2023-09-09', 610.34, 6);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (21, '2023-09-20', 734.88, 3);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (22, '2023-10-01', 655.12, 4);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (23, '2023-10-14', 700.01, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (24, '2023-10-30', 598.76, 1);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (25, '2023-11-12', 832.55, 5);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (26, '2023-11-25', 744.33, 6);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (27, '2023-12-05', 683.90, 2);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (28, '2023-12-18', 904.77, 4);
+--INSERT INTO purchases (id, createdon, value, purchaseid) VALUES (29, '2023-12-30', 799.60, 3);
+
+--1. Calculate Month Over Month Change
+
+
+--with cte as
+--(
+--select 
+--FORMAT(createdon,'MM-yyyy') as Month,
+--SUM(value) as Total_Amt
+--from purchases
+--group by FORMAT(createdon,'MM-yyyy')
+--)
+--select 
+--Month,
+--Total_Amt,
+--round(cast(total_amt - LAG(total_amt) over(order by month ) as float)/ LAG(total_amt) over(order by month ) * 100,2) as MOM_Change
+--from cte
+
+----------------------------------------------------------------------------------------------------------------------------------
+
+--CREATE TABLE orders(
+-- order_id INT,
+-- order_date DATE,
+-- order_amt INT,
+-- order_cust_id INT
+--);
+
+--INSERT INTO orders VALUES(100,'2023-01-13',5000,10),
+--(562,'2023-06-16',3000,78),
+--(125,'2023-02-22',2220,10),
+--(416,'2023-02-27',200,10),
+--(93,'2023-01-12',8050,23),
+--(611,'2023-02-26',9800,10),
+--(734,'2023-03-11',9000,63),
+--(466,'2023-06-18',6500,78),
+--(410,'2023-01-19',1000,18),
+--(461,'2023-03-25',500,63),
+--(235,'2023-06-23',6000,78),
+--(257,'2023-06-24',330,78);
+
+--2.  Find 3 consecutive orders within 7 days
+
+--with cte as (
+--select *,
+--LEAD(order_date) over(partition by order_cust_id order by order_date) as order_date2,
+--LEAD(order_date,2) over(partition by order_cust_id order by order_date) as order_date3
+--from orders
+--),
+--cte2 as
+--(
+--select 
+--order_cust_id,order_date,order_date2,order_date3
+--from cte
+--where DATEDIFF(day,order_date,order_date2) <=7
+--and      DATEDIFF(day,order_date,order_date3) <=7
+--)
+--select 
+--o.order_id,
+--o.order_date,
+--o.order_cust_id,
+--order_amt
+--from orders o
+--join cte2 c
+--on o.order_cust_id =c.order_cust_id
+--and o.order_date between c.order_date and c.order_date3
+--group by order_id,order_amt,o.order_date,o.order_cust_id
+--order by o.order_date
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--CREATE TABLE match_score(
+-- player_id INT,
+-- player_name VARCHAR(100),  
+-- player_score INT,
+-- match_date DATE
+--);
+
+--INSERT INTO match_score VALUES(18,'Virat Kohli',83,'2022-09-10'),
+--(63,'Suryakumar Yadav',103,'2022-03-13'),
+--(45,'Rohit Sharma',160,'2022-10-05'),
+--(8,'Ravindra Jadeja',14,'2022-06-09'),
+--(45,'Rohit Sharma',46,'2022-12-31'),
+--(18,'Virat Kohli',45,'2022-08-23'),
+--(8,'Ravindra Jadeja',5,'2022-04-26'),
+--(18,'Virat Kohli',115,'2022-11-29'),
+--(18,'Virat Kohli',91,'2022-06-11'),
+--(45,'Rohit Sharma',46,'2022-01-07'),
+--(18,'Virat Kohli',180,'2022-04-08');
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+----3.identify the 3rd highest score of each player order by match_date. In case the player has played only 1 or 2 matches, 
+----we need to find the least score in those matches.
+
+--with cte as
+--(
+--select *,
+--ROW_NUMBER() over(partition by player_id order by player_score desc, match_date ) as rnk,
+--count(1) over(partition by player_id) as cnt
+--from match_score
+--)
+--select * from cte 
+--where rnk = 3 or (cnt <3 and cnt = rnk)
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--CREATE TABLE purchase (
+--    purchase_id INT PRIMARY KEY,
+--    customer_id INT,
+--    item_name VARCHAR(100),
+--    purchase_timestamp DATETIME
+--);
+
+--INSERT INTO purchase (purchase_id, customer_id, item_name, purchase_timestamp) VALUES
+--(1, 101, 'Laptop', '2024-01-05 10:15:00'),
+--(2, 102, 'Smartphone', '2024-01-10 14:30:00'),
+--(3, 101, 'Tablet', '2024-02-15 09:45:00'),
+--(4, 103, 'Headphones', '2024-02-20 17:25:00'),
+--(5, 101, 'Smartwatch', '2024-03-01 12:00:00'),
+--(6, 104, 'Monitor', '2024-03-15 08:50:00'),
+--(7, 102, 'Laptop', '2024-03-25 13:40:00'),
+--(8, 101, 'Keyboard', '2024-04-10 11:05:00'),
+--(9, 103, 'Mouse', '2024-04-25 10:30:00'),
+--(10, 104, 'Speakers', '2024-05-01 15:55:00');
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--4. Find First and Last Purchases for Each Customer
+
+--with cte as
+--(
+--select *,
+--ROW_NUMBER() over(partition by customer_id order by purchase_timestamp) as first_purchase,
+--ROW_NUMBER() over(partition by customer_id order by purchase_timestamp desc) as last_purchase
+--from purchase
+--)
+--select *,
+--case when first_purchase = 1 then 'First_Purchase' else 'Last_Purchase' end as Purchase
+--from cte
+--where first_purchase = 1 or last_purchase =1
+--order by first_purchase
+
+-----------------------------------------------------------------------------------------------------------------------------------
+--CREATE TABLE Monthly_orders (
+--    orderid INT PRIMARY KEY,
+--    customerid INT,
+--    orderdate DATE
+--);
+
+--INSERT INTO Monthly_orders (orderid, customerid, orderdate) VALUES
+--(1, 101, '2023-01-15'),
+--(2, 101, '2023-03-10'),
+--(3, 101, '2024-01-05'),
+--(4, 101, '2024-04-18'),
+--(5, 101, '2025-01-11'),
+--(6, 101, '2025-02-25'),
+--(7, 102, '2023-02-20'),
+--(8, 102, '2023-06-01'),
+--(9, 102, '2024-02-05'),
+--(10, 102, '2024-05-22'),
+--(11, 102, '2025-03-17'),
+--(12, 103, '2023-03-03'),
+--(13, 103, '2023-07-15'),
+--(14, 103, '2024-03-10'),
+--(15, 103, '2025-03-15'),
+--(16, 104, '2023-01-09'),
+--(17, 104, '2023-04-25'),
+--(18, 104, '2024-06-05'),
+--(19, 104, '2025-06-18'),
+--(20, 105, '2023-08-21'),
+--(21, 105, '2024-08-01'),
+--(22, 105, '2025-08-12'),
+--(23, 105, '2025-09-14');
+
+
+--5. Find the count of months in the year - in which customer has placed atleast 1 order
+
+--with cte as
+--(
+--select 
+--customerid,
+--DATEPART(YEAR,orderdate) as Yr,
+--DATEPART(MM,orderdate) as Month
+--from Monthly_orders
+--group by customerid,
+--DATEPART(YEAR,orderdate) ,
+--DATEPART(MM,orderdate) 
+--)
+--select 
+--customerid,Yr,
+--COUNT(3) as cnt
+--from cte
+--group by customerid,Yr
+--order by customerid
+
