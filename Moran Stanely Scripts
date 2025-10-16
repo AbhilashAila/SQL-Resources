@@ -1,0 +1,158 @@
+
+Top 5 Questions Asked in  Morgan Stanley
+
+CREATE TABLE Employee_Details (
+    Emp_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Emp_Name VARCHAR(100),
+    Joining_Date DATE
+);
+
+INSERT INTO Employee_Details (Emp_Name, Joining_Date) VALUES
+('Amit Sharma', '2025-10-01'),
+('Neha Verma', '2025-09-10'),
+('Ravi Kumar', '2025-08-05'),
+('Pooja Singh', '2025-07-20'),
+('Rakesh Gupta', '2025-06-18'),
+('Simran Kaur', '2025-09-25'),
+('Rahul Mehta', '2025-08-22'),
+('Sneha Iyer', '2025-05-15');
+
+ 1. Query to Find Employees Hired in the Last 2 Months from today
+
+Select  *
+from Employee_Details
+where Joining_Date >= DATEADD(month,-2,getdate())
+-------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE Employee_Manager (
+    Emp_ID INT PRIMARY KEY,
+    Emp_Name VARCHAR(100),
+    Manager_ID INT NULL
+);
+
+INSERT INTO Employee_Manager (Emp_ID, Emp_Name, Manager_ID) VALUES
+(1, 'Rajesh Sharma', NULL),       
+(2, 'Amit Verma', 1),
+(3, 'Neha Gupta', 1),
+(4, 'Rohit Mehta', 1),
+(5, 'Pooja Iyer', 1),
+(6, 'Anil Kumar', 1),            
+(7, 'Sneha Reddy', 2),
+(8, 'Vikas Yadav', 2),
+(9, 'Nisha Patel', 2),
+(10, 'Rakesh Das', 2),
+(11, 'Manoj Joshi', 2),          
+(12, 'Sonal Singh', 3),
+(13, 'Ajay Nair', 3),
+(14, 'Deepak Rao', 3),
+(15, 'Meena Paul', 4);
+
+ 2. Query to Find All Managers with ≥ 5 Direct Reportees
+
+select m.Emp_Name as Mngr_Name,COUNT(e.Emp_ID) as Emp_Reports
+from Employee_Manager e
+join
+Employee_Manager m 
+on e.Manager_ID = m.Emp_ID
+group by m.Emp_Name
+Having COUNT(e.Emp_ID) >=5
+
+
+
+CREATE TABLE Customer_Bookings (
+    Booking_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Customer_Name VARCHAR(100),
+    Booking_Type VARCHAR(50)  -- 'Air' or 'Train'
+);
+
+INSERT INTO Customer_Bookings (Customer_Name, Booking_Type) VALUES
+('Amit Sharma', 'Air'),
+('Amit Sharma', 'Train'),
+('Neha Verma', 'Air'),
+('Ravi Kumar', 'Train'),
+('Ravi Kumar', 'Air'),
+('Pooja Singh', 'Train'),
+('Rakesh Gupta', 'Air'),
+('Simran Kaur', 'Train'),
+('Simran Kaur', 'Air'),
+('Rahul Mehta', 'Train'),
+('Sneha Iyer', 'Air');
+
+3. Customers Who Booked Both Air and Train Tickets
+
+Select 
+Customer_Name
+from Customer_Bookings
+Where Booking_Type in ('Air' , 'Train')
+group by Customer_Name
+Having COUNT(distinct Booking_Type) = 2
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE Sales_Duplicates (
+    Sale_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Order_ID INT,
+    Customer_Name VARCHAR(100),
+    Product_Name VARCHAR(100),
+    Sale_Amount DECIMAL(10,2),
+    Sale_Date DATE
+);
+
+INSERT INTO Sales_Duplicates (Order_ID, Customer_Name, Product_Name, Sale_Amount, Sale_Date) VALUES
+(101, 'Amit Sharma', 'Mobile', 15000, '2025-10-10'),
+(102, 'Neha Verma', 'Laptop', 55000, '2025-10-11'),
+(101, 'Amit Sharma', 'Mobile', 15000, '2025-10-10'),
+(103, 'Ravi Kumar', 'Headphones', 2500, '2025-10-12'),
+(102, 'Neha Verma', 'Laptop', 55000, '2025-10-11'),
+(104, 'Pooja Singh', 'Tablet', 12000, '2025-10-13');
+
+4. Identify & Delete Duplicate Records
+
+Delete from Sales_Duplicates
+where Sale_ID in 
+(
+select 
+Sale_ID
+from 
+(
+select *,
+ROW_NUMBER() Over(partition by order_id, customer_Name,product_Name order by sale_id) as rn
+from Sales_Duplicates
+) a
+where rn >1)
+
+CREATE TABLE Job_Logs (
+    Log_ID INT IDENTITY(1,1) PRIMARY KEY,
+    Job_ID INT,
+    Job_Start_Time DATETIME,
+    Job_Status VARCHAR(20)
+);
+
+INSERT INTO Job_Logs (Job_ID, Job_Start_Time, Job_Status) VALUES
+(101, '2025-10-10 08:00', 'Success'),
+(101, '2025-10-11 08:00', 'Failure'),
+(101, '2025-10-12 08:00', 'Failure'),
+(101, '2025-10-13 08:00', 'Failure'), 
+(101, '2025-10-14 08:00', 'Success'),
+(102, '2025-10-10 08:00', 'Failure'),
+(102, '2025-10-11 08:00', 'Success'),
+(102, '2025-10-12 08:00', 'Failure'),
+(102, '2025-10-13 08:00', 'Failure'),
+(102, '2025-10-14 08:00', 'Success'),
+(103, '2025-10-10 08:00', 'Failure'),
+(103, '2025-10-11 08:00', 'Failure'),
+(103, '2025-10-12 08:00', 'Failure'), 
+(103, '2025-10-13 08:00', 'Failure'); 
+
+5. Write a query to find all jobs that failed 3 times consecutively
+
+select 
+Job_ID
+from 
+(
+Select *,
+Cast(Dateadd(Day, -ROW_NUMBER() Over(Partition by Job_Id Order by Job_Start_Time), Job_Start_Time) as Date) as Dates
+from Job_Logs
+where Job_Status = 'Failure'
+)a
+group by Job_ID, Dates
+having COUNT(*)>=3
+
+
